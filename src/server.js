@@ -1,109 +1,17 @@
-import http from 'node:http';
+import http  from 'http'
+import db from'../DB/db.js';
 
-const laughariki = [
-    {
-        id: 1,
-        name: 'Копатыч',
-        avatar: 'https://example.com/kopatych.png', // Ссылка на изображение
-        description: 'Копатыч — добрый и трудолюбивый медведь, который обожает садоводство и природу.',
-        character: 'Спокойный, заботливый, иногда немного наивный.',
-        hobbies: 'Садоводство, выращивание овощей, забота о природе.',
-        favoritePhrases: ['Так говорят все поработители! Сво-бо-ду! Сво-бо-ду!', 'Ох, уж эти городские жители!'],
-        friends: ['Лосяш', 'Совунья', 'Бараш']
-    },
-    {
-        id: 2,
-        name: 'Крош',
-        avatar: 'https://example.com/krosh.png',
-        description: 'Крош — веселый и энергичный кролик, который обожает приключения и шутки.',
-        character: 'Оптимист, любит шутки, иногда бывает безответственным.',
-        hobbies: 'Приключения, спорт, веселье.',
-        favoritePhrases: ['Ёлки-иголки!', 'Это же просто праздник какой-то!'],
-        friends: ['Ёжик', 'Нюша', 'Бараш']
-    },
-    {
-        id: 3,
-        name: 'Ёжик',
-        avatar: 'https://example.com/ezhik.png',
-        description: 'Ёжик — скромный и добрый друг Кроша, который всегда готов помочь.',
-        character: 'Скромный, застенчивый, но очень преданный друг.',
-        hobbies: 'Чтение, коллекционирование, помощь друзьям.',
-        favoritePhrases: ['Я не трус, но я боюсь!', 'Ой, что-то мне страшно...'],
-        friends: ['Крош', 'Нюша', 'Бараш']
-    },
-    {
-        id: 4,
-        name: 'Нюша',
-        avatar: 'https://example.com/nyusha.png',
-        description: 'Нюша — романтичная и мечтательная свинка, которая обожает моду и красоту.',
-        character: 'Мечтательная, немного капризная, но добрая.',
-        hobbies: 'Мода, красота, танцы.',
-        favoritePhrases: ['Красота — это страшная сила!', 'Я хочу быть принцессой!'],
-        friends: ['Крош', 'Ёжик', 'Бараш']
-    },
-    {
-        id: 5,
-        name: 'Бараш',
-        avatar: 'https://example.com/barash.png',
-        description: 'Бараш — меланхоличный поэт, который пишет стихи и любит философствовать.',
-        character: 'Мечтательный, романтичный, иногда грустный.',
-        hobbies: 'Поэзия, философия, размышления.',
-        favoritePhrases: ['Я — поэт, зовусь я Бараш, и я пишу стихи для вас!', 'Всё в этом мире тленно...'],
-        friends: ['Нюша', 'Копатыч', 'Совунья']
-    },
-    {
-        id: 6,
-        name: 'Пин',
-        avatar: 'https://example.com/pin.png',
-        description: 'Пин — гениальный изобретатель, который создает невероятные устройства.',
-        character: 'Умный, изобретательный, иногда немного рассеянный.',
-        hobbies: 'Изобретения, наука, конструирование.',
-        favoritePhrases: ['Это же элементарно, Ватсон!', 'Моя новая идея!'],
-        friends: ['Лосяш', 'Копатыч', 'Кар-Карыч']
-    },
-    {
-        id: 7,
-        name: 'Лосяш',
-        avatar: 'https://example.com/losyash.png',
-        description: 'Лосяш — умный и любознательный лось, который увлекается наукой.',
-        character: 'Умный, любознательный, иногда немного занудный.',
-        hobbies: 'Наука, эксперименты, чтение.',
-        favoritePhrases: ['Наука — это круто!', 'Это противоречит законам физики!'],
-        friends: ['Пин', 'Копатыч', 'Совунья']
-    },
-    {
-        id: 8,
-        name: 'Совунья',
-        avatar: 'https://example.com/sovunya.png',
-        description: 'Совунья — заботливая сова, которая следит за здоровьем и порядком.',
-        character: 'Заботливая, мудрая, иногда строгая.',
-        hobbies: 'Здоровье, кулинария, забота о друзьях.',
-        favoritePhrases: ['Здоровье — это главное!', 'Пора делать зарядку!'],
-        friends: ['Копатыч', 'Лосяш', 'Бараш']
-    },
-    {
-        id: 9,
-        name: 'Кар-Карыч',
-        avatar: 'https://example.com/karkarych.png',
-        description: 'Кар-Карыч — мудрый ворон, который любит рассказывать истории из прошлого.',
-        character: 'Мудрый, немного ностальгирующий, иногда ворчливый.',
-        hobbies: 'Рассказывать истории, философствовать.',
-        favoritePhrases: ['В моё время всё было по-другому!', 'Эх, молодёжь...'],
-        friends: ['Пин', 'Лосяш', 'Совунья']
-    },
-    {
-        id: 10,
-        name: 'Биби',
-        avatar: 'https://example.com/bibi.png',
-        description: 'Биби — маленький робот, который всегда готов помочь.',
-        character: 'Добрый, любознательный, немного наивный.',
-        hobbies: 'Помощь друзьям, изучение мира.',
-        favoritePhrases: ['Биби-биби! Я — робот!', 'Я могу помочь!'],
-        friends: ['Пин', 'Крош', 'Ёжик']
+// Проверка подключения и выполнения запроса
+(async () => {
+    try {
+        const result = await db.query('SELECT datname FROM pg_database');
+        console.log('Тестовый запрос выполнен успешно. Базы данных:', result.rows);
+    } catch (err) {
+        console.error('Ошибка при выполнении тестового запроса:', err);
     }
-];
+})();
 
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
     if (req.url.startsWith('/api')) {
         let body = '';
 
@@ -112,7 +20,7 @@ const server = http.createServer((req, res) => {
                 body += chunk.toString();
             });
 
-            req.on('end', () => {
+            req.on('end', async () => {
                 try {
                     const parsedBody = JSON.parse(body);
 
@@ -122,22 +30,13 @@ const server = http.createServer((req, res) => {
 
                     const { name, avatar, description, character, hobbies, favoritePhrases, friends } = parsedBody;
 
-                    const maxId = Math.max(...laughariki.map(laugharik => laugharik.id), 0);
-                    const newItem = {
-                        id: maxId + 1,
-                        name,
-                        avatar,
-                        description,
-                        character,
-                        hobbies,
-                        favoritePhrases,
-                        friends
-                    };
-
-                    laughariki.push(newItem);
+                    const result = await db.query(
+                        'INSERT INTO characters (name, avatar, description, character, hobbies, favoritePhrases, friends) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+                        [name, avatar, description, character, hobbies, favoritePhrases, friends]
+                    );
 
                     res.writeHead(200, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify(laughariki));
+                    res.end(JSON.stringify(result.rows[0]));
                 } catch (error) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ error: 'Невалидный JSON' }));
@@ -154,21 +53,35 @@ const server = http.createServer((req, res) => {
                 return;
             }
 
-            const startIndex = (page - 1) * limit;
-            const endIndex = startIndex + limit;
+            const offset = (page - 1) * limit;
 
-            const paginatedData = laughariki.slice(startIndex, endIndex);
+            try {
+                const result = await db.query(
+                    'SELECT * FROM characters ORDER BY id LIMIT $1 OFFSET $2',
+                    [limit, offset]
 
-            res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({
-                data: paginatedData,
-                pagination: {
-                    totalItems: laughariki.length,
-                    currentPage: page,
-                    totalPages: Math.ceil(laughariki.length / limit),
-                    itemsPerPage: limit
-                }
-            }));
+                );
+                console.log(result);
+
+                const totalResult = await db.query('SELECT COUNT(*) FROM characters');
+                const totalItems = parseInt(totalResult.rows[0].count, 10);
+
+                console.log(result.rows);
+
+                res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+                res.end(JSON.stringify({
+                    data: result.rows,
+                    pagination: {
+                        totalItems,
+                        currentPage: page,
+                        totalPages: Math.ceil(totalItems / limit),
+                        itemsPerPage: limit
+                    }
+                }));
+            } catch (error) {
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Ошибка сервера' }));
+            }
         } else if (req.method === 'PUT') {
             body = '';
 
@@ -176,7 +89,7 @@ const server = http.createServer((req, res) => {
                 body += chunk.toString();
             });
 
-            req.on('end', () => {
+            req.on('end', async () => {
                 try {
                     const data = JSON.parse(body);
 
@@ -192,63 +105,23 @@ const server = http.createServer((req, res) => {
                         return;
                     }
 
-                    const index = laughariki.findIndex(item => item.id === id);
+                    const { name, avatar, description, character, hobbies, favoritePhrases, friends } = data;
 
-                    if (index === -1) {
+                    const result = await db.query(
+                        'UPDATE characters SET name = $1, avatar = $2, description = $3, character = $4, hobbies = $5, favoritePhrases = $6, friends = $7 WHERE id = $8 RETURNING *',
+                        [name, avatar, description, character, hobbies, favoritePhrases, friends, id]
+                    );
+
+                    if (result.rows.length === 0) {
                         res.writeHead(404, { 'Content-Type': 'application/json' });
                         res.end(JSON.stringify({ error: 'Ресурс не найден' }));
                         return;
                     }
 
-                    laughariki[index] = { ...laughariki[index], ...data };
-
                     res.writeHead(200, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({
                         message: 'Данные обновлены успешно',
-                        data: laughariki[index]
-                    }));
-                } catch (error) {
-                    res.writeHead(400, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ error: 'Невалидный JSON' }));
-                }
-            });
-        } else if (req.method === 'PATCH') {
-            body = '';
-
-            req.on('data', (chunk) => {
-                body += chunk.toString();
-            });
-
-            req.on('end', () => {
-                try {
-                    const data = JSON.parse(body);
-
-                    if (checkoutOneRequired(data, res)) {
-                        return;
-                    }
-
-                    const id = parseInt(req.url.split("/")[2]);
-
-                    if (isNaN(id)) {
-                        res.writeHead(400, { 'Content-Type': 'application/json' });
-                        res.end(JSON.stringify({ error: 'Невалидный ID' }));
-                        return;
-                    }
-
-                    const index = laughariki.findIndex(item => item.id === id);
-
-                    if (index === -1) {
-                        res.writeHead(404, { 'Content-Type': 'application/json' });
-                        res.end(JSON.stringify({ error: 'Ресурс не найден' }));
-                        return;
-                    }
-
-                    laughariki[index] = { ...laughariki[index], ...data };
-
-                    res.writeHead(200, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({
-                        message: 'Данные обновлены успешно',
-                        data: laughariki[index]
+                        data: result.rows[0]
                     }));
                 } catch (error) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -264,21 +137,24 @@ const server = http.createServer((req, res) => {
                 return;
             }
 
-            const index = laughariki.findIndex(item => item.id === id);
+            try {
+                const result = await db.query('DELETE FROM characters WHERE id = $1 RETURNING *', [id]);
 
-            if (index === -1) {
-                res.writeHead(404, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ error: 'Ресурс не найден' }));
-                return;
+                if (result.rows.length === 0) {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Ресурс не найден' }));
+                    return;
+                }
+
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({
+                    message: 'Ресурс успешно удален',
+                    data: result.rows[0]
+                }));
+            } catch (error) {
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Ошибка сервера' }));
             }
-
-            laughariki.splice(index, 1);
-
-            res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({
-                message: 'Ресурс успешно удален',
-                data: laughariki
-            }));
         } else {
             res.writeHead(405, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ error: 'Метод не поддерживается' }));
@@ -293,15 +169,6 @@ function checkoutRequired(data, res) {
     if (!data.name || !data.avatar || !data.description || !data.character || !data.hobbies || !data.favoritePhrases || !data.friends) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'Все поля должны быть заполнены' }));
-        return true;
-    }
-    return false;
-}
-
-function checkoutOneRequired(data, res) {
-    if (!data.name && !data.avatar && !data.description && !data.character && !data.hobbies && !data.favoritePhrases && !data.friends) {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Хотя бы одно поле должно быть заполнено' }));
         return true;
     }
     return false;
